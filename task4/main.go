@@ -17,6 +17,7 @@ func main() {
 	valids := 0
 	lines := strings.Split(string(b), "\n")
 
+LINE_LOOP:
 	for _, line := range lines {
 		if line == "" {
 			continue
@@ -32,32 +33,47 @@ func main() {
 			lvls = append(lvls, n)
 		}
 
-		inc := false
-		fails := 0
-		for i, lvl := range lvls {
-			if i < 1 {
-				continue
+		//valid := true
+		for skipIndex := -1; skipIndex < len(lvls); skipIndex++ {
+			// Copy lvls but skip current Index
+			lvlsCopy := make([]int, 0)
+			for i, v := range lvls {
+				if i == skipIndex {
+					continue
+				}
+
+				lvlsCopy = append(lvlsCopy, v)
 			}
 
-			diff := math.Abs(float64(lvl - lvls[i-1]))
-			if diff < 1 || diff > 3 {
-				fails++
-				continue
+			inc := false
+			valid := true
+			for i, lvl := range lvlsCopy {
+				if i < 1 {
+					continue
+				}
+
+				diff := math.Abs(float64(lvl - lvlsCopy[i-1]))
+				if diff < 1 || diff > 3 {
+					valid = false
+					break
+				}
+
+				if i == 1 {
+					inc = lvl > lvlsCopy[i-1]
+				} else if (inc && lvl < lvlsCopy[i-1]) || (!inc && lvl > lvlsCopy[i-1]) {
+					valid = false
+					break
+				}
 			}
 
-			if i == 1 {
-				inc = lvl > lvls[i-1]
-			} else if (inc && lvl < lvls[i-1]) || (!inc && lvl > lvls[i-1]) {
-				fails++
+			fmt.Println(valid, skipIndex, lvlsCopy)
+			if valid {
+				valids++
+				continue LINE_LOOP
 			}
 
 		}
 
-		if fails > 1 {
-			continue
-		}
-
-		valids++
 	}
 
 	fmt.Println(valids)
