@@ -17,14 +17,40 @@ func main() {
 	}
 
 	text = string(b)
-	lineLen = len(strings.Split(text, "\n"))
+	lineLen = len(strings.Split(text, "\n")[0])
 
 	// Find XMAS normal
 	wc := findWord("XMAS")
 	wc += findWord("SAMX")
 
+	// Find diagonals
+	touchedIndexes := make(map[int]bool)
+	for i, c := range text {
+		if !isRightChar(c) {
+			continue
+		}
+		if touchedIndexes[i] {
+			continue
+		}
+                touchedIndexes[i] = true
+
+                // Explorer neighbours
+                if i >= lineLen {
+                  topLeft := getDiagNeighbourIndex(i, false, false)
+                  topRight := getDiagNeighbourIndex(i, true, false)
+                } 
+
+                bottomLeft := getDiagNeighbourIndex(i, false, true)
+                bottomRight := getDiagNeighbourIndex(i, true, true)
+
+	}
+
 	fmt.Println("words", wc)
 
+}
+
+func isRightChar(c rune) bool {
+	return c == 'X' || c == 'M' || c == 'A' || c == 'S'
 }
 
 func findWord(w string) int {
